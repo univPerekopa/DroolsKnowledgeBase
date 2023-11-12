@@ -1,0 +1,44 @@
+package org.drools.examples.relationships
+
+import org.drools.examples.relationships.Relationships.Person;
+import org.drools.examples.relationships.Relationships.Relationship;
+
+// Rule to identify parent-child relationships
+rule "Parent-Child Relationship"
+when
+    $parent: Person()
+    $child: Person(parent == $parent)
+then
+    insert(new Relationship($parent, $child, "Parent", "Child"));
+end
+
+// Rule to identify sibling relationships
+rule "Sibling Relationship"
+when
+    $firstPerson: Person()
+    $secondPerson: Person(name != $firstPerson.name, parent == $firstPerson.parent)
+then
+    insert(new Relationship($firstPerson, $secondPerson, "Sibling", "Sibling"));
+    insert(new Relationship($secondPerson, $firstPerson, "Sibling", "Sibling"));
+end
+
+// Rule to identify grandparent-grandchild relationships
+rule "Grandparent-Grandchild Relationship"
+when
+    $grandparent: Person()
+    $parent: Person(parent == $grandparent)
+    $grandchild: Person(parent == $parent)
+then
+    insert(new Relationship($grandparent, $grandchild, "Grandparent", "Grandchild"));
+end
+
+// Rule to identify uncle-nephew relationships
+rule "Uncle-Nephew Relationship"
+when
+    $grandparent: Person()
+    $parent: Person(parent == $grandparent)
+    $uncle: Person(name != $parent.name, parent == $grandparent)
+    $nephew: Person(parent == $parent)
+then
+    insert(new Relationship($uncle, $nephew, "Uncle (or aunt)", "Nephew (or niece)"));
+end
